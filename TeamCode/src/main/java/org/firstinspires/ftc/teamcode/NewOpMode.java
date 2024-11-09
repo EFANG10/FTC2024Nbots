@@ -83,7 +83,7 @@ public class NewOpMode extends LinearOpMode {
     static final int    CYCLE_MS    =   50;     // period of each cycle
     static final double MAX_POS     =  1.0;     // Maximum rotational position
     static final double MIN_POS     =  0.0;     // Minimum rotational position
-    Servo gateservo;
+    private CRServo gate;
     double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
     boolean rampUp = true;
     @Override
@@ -211,10 +211,10 @@ public class NewOpMode extends LinearOpMode {
                 rightFrontPower /= 4;
             }
             if(gamepad2.y){
-                gateservo.setPosition(.25);
+                gate.setPosition(.25);
             }
             if(gamepad2.a){
-                gateservo.setPosition(0);
+                gate.setPosition(0);
             }
 
             leftFrontDrive.setPower(leftFrontPower);
