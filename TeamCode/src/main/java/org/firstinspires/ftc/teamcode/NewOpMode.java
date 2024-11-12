@@ -84,6 +84,7 @@ public class NewOpMode extends LinearOpMode {
     static final double MAX_POS     =  1.0;     // Maximum rotational position
     static final double MIN_POS     =  0.0;     // Minimum rotational position
     private Servo gateservo;
+
     double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
     boolean rampUp = true;
     @Override
@@ -211,6 +212,7 @@ public class NewOpMode extends LinearOpMode {
             }
             if(gamepad2.y){
                 gateservo.setPosition(0.5);
+
             }
             if(gamepad2.a){
                 gateservo.setPosition(0);
