@@ -234,11 +234,16 @@ public class NewOpMode extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.update();
 
-            if(gamepad2.right_bumper){
-                arm1Power = .75;
+
+            if (gamepad2.right_bumper) {
+                arm1Power = -1;
+            }
+            else if (gamepad2.left_bumper){
+                arm1Power = 1;
 
             }else{
                 arm1Power = 0.0;
             }
+arm1Lift.setPower(arm1Power);
         }
     }}
