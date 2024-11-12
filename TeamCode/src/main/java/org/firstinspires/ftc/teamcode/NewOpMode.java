@@ -72,7 +72,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 @TeleOp(name="First_try")
 //@Disabled
 public class NewOpMode extends LinearOpMode {
-    IMU imu;
+    private IMU imu;
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
@@ -83,7 +83,7 @@ public class NewOpMode extends LinearOpMode {
     static final int    CYCLE_MS    =   50;     // period of each cycle
     static final double MAX_POS     =  1.0;     // Maximum rotational position
     static final double MIN_POS     =  0.0;     // Minimum rotational position
-    Servo gateservo;
+    private Servo gateservo;
     double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
     boolean rampUp = true;
     @Override
@@ -96,7 +96,7 @@ public class NewOpMode extends LinearOpMode {
          *
          * Two input parameters are required to fully specify the Orientation.
          * The first parameter specifies the direction the printed logo on the Hub is pointing.
-         * The second parameter specifies the direction the USB connector on the Hub is pointing.
+         * The second parameter specfies the direction the USB connector on the Hub is pointing.
          * All directions are relative to the robot, and left/right is as-viewed from behind the robot.
          *
          * If you are using a REV 9-Axis IMU, you can use the Rev9AxisImuOrientationOnRobot class instead of the
@@ -143,7 +143,6 @@ public class NewOpMode extends LinearOpMode {
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
-        telemetry.update();
 
         waitForStart();
         runtime.reset();
@@ -211,7 +210,7 @@ public class NewOpMode extends LinearOpMode {
                 rightFrontPower /= 4;
             }
             if(gamepad2.y){
-                gateservo.setPosition(.25);
+                gateservo.setPosition(0.5);
             }
             if(gamepad2.a){
                 gateservo.setPosition(0);
