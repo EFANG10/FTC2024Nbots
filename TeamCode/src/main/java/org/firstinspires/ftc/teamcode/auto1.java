@@ -86,6 +86,7 @@ public class auto1 extends LinearOpMode {
     double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
     boolean rampUp = true;
     @Override
+    //added new comment here
     public void runOpMode() {
         // Retrieve and initialize the IMU.
         // This sample expects the IMU to be in a REV Hub and named "imu".
