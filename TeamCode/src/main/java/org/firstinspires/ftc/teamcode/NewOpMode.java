@@ -41,6 +41,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
+import java.util.Set;
+
 /*
  * This file contains an example of a Linear "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -72,21 +74,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 @TeleOp(name="First_try")
 //@Disabled
 public class NewOpMode extends LinearOpMode {
-    private IMU imu;
+    IMU imu;
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor arm1Lift = null;
+
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
     static final int    CYCLE_MS    =   50;     // period of each cycle
     static final double MAX_POS     =  1.0;     // Maximum rotational position
     static final double MIN_POS     =  0.0;     // Minimum rotational position
     private Servo gateservo;
-
     double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
     boolean rampUp = true;
+    double arm1Power = 0.0;
     @Override
     public void runOpMode() {
         // Retrieve and initialize the IMU.
@@ -97,7 +101,7 @@ public class NewOpMode extends LinearOpMode {
          *
          * Two input parameters are required to fully specify the Orientation.
          * The first parameter specifies the direction the printed logo on the Hub is pointing.
-         * The second parameter specfies the direction the USB connector on the Hub is pointing.
+         * The second parameter specifies the direction the USB connector on the Hub is pointing.
          * All directions are relative to the robot, and left/right is as-viewed from behind the robot.
          *
          * If you are using a REV 9-Axis IMU, you can use the Rev9AxisImuOrientationOnRobot class instead of the
@@ -126,6 +130,7 @@ public class NewOpMode extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "back left");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "front right");
         rightBackDrive = hardwareMap.get(DcMotor.class, "back right");
+        arm1Lift = hardwareMap.get(DcMotor.class, "arm1");
 
         // ####################################################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions and names from configuation.            !!!!!
@@ -144,6 +149,7 @@ public class NewOpMode extends LinearOpMode {
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
         waitForStart();
         runtime.reset();
@@ -151,7 +157,7 @@ public class NewOpMode extends LinearOpMode {
         //check positive or negative values on this
         double ProConstant = 0.1;
 
-
+//where did the autos go___ across the road :)
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -211,8 +217,7 @@ public class NewOpMode extends LinearOpMode {
                 rightFrontPower /= 4;
             }
             if(gamepad2.y){
-                gateservo.setPosition(0.5);
-
+                gateservo.setPosition(.25);
             }
             if(gamepad2.a){
                 gateservo.setPosition(0);
@@ -228,5 +233,17 @@ public class NewOpMode extends LinearOpMode {
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.update();
+
+
+            if (gamepad2.right_bumper) {
+                arm1Power = -1;
+            }
+            else if (gamepad2.left_bumper){
+                arm1Power = 1;
+
+            }else{
+                arm1Power = 0.0;
+            }
+            arm1Lift.setPower(arm1Power);
         }
     }}
