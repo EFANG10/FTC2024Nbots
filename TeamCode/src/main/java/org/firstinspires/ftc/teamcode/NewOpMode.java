@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -96,6 +97,8 @@ public class NewOpMode extends LinearOpMode {
         // Retrieve and initialize the IMU.
         // This sample expects the IMU to be in a REV Hub and named "imu".
         imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
+        imu.initialize(parameters);
         gateservo = hardwareMap.get(Servo.class, "gate");
         /* Define how the hub is mounted on the robot to get the correct Yaw, Pitch and Roll values.
          *
@@ -113,14 +116,8 @@ public class NewOpMode extends LinearOpMode {
          *
          * To Do:  EDIT these two lines to match YOUR mounting configuration.
          */
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
-
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
         // Now initialize the IMU with this mounting orientation
         // Note: if you choose two conflicting directions, this initialization will cause a code exception.
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 
 
@@ -149,7 +146,6 @@ public class NewOpMode extends LinearOpMode {
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
-        telemetry.update();
 
         waitForStart();
         runtime.reset();
@@ -162,33 +158,33 @@ public class NewOpMode extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
+            double botheading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
+            double stick_y = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double stick_x =  gamepad1.left_stick_x;
             YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-            double readAngle = orientation.getYaw(AngleUnit.DEGREES);
-            telemetry.addData("Angle", readAngle);
+            telemetry.addData("Angle", botheading);
             telemetry.update();
-            if(gamepad1.right_trigger > 0){
-                setAngle = orientation.getYaw(AngleUnit.DEGREES);
+            if(gamepad1.a){
+                imu.resetYaw();
             }
             //proportional algorithm for angle correction
-            double error = setAngle-readAngle;
+            //double error = setAngle-botheading;
             //double yaw = error*ProConstant;
 
             //yaw += gamepad1.right_stick_x;
 
-            //double x_rotated = lateral * Math.cos(yaw) - axial * Math.sin(yaw);
-            //double y_rotated = lateral * Math.sin(yaw) + axial * Math.cos(yaw);
-            double x_rotated = lateral;
-            double y_rotated = axial*0.8;
+            //double x_rotated = stick_x * Math.cos(yaw) - stick_y * Math.sin(yaw);
+            //double y_rotated = stick_x * Math.sin(yaw) + stick_y * Math.cos(yaw);
+            double x_rotated = stick_x * Math.cos(-botheading) - stick_y * Math.sin(-botheading);
+            double y_rotated = stick_x * Math.sin(-botheading) + stick_y * Math.cos(-botheading);
             double yaw = gamepad1.right_stick_x;
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower  = x_rotated + y_rotated + yaw;
-            double rightFrontPower = x_rotated - y_rotated + yaw;
-            double leftBackPower   = x_rotated - y_rotated - yaw;
-            double rightBackPower  = x_rotated + y_rotated - yaw;
+            double leftFrontPower  = x_rotated + y_rotated + yaw; //was + closest -
+            double rightFrontPower = x_rotated - y_rotated + yaw; //was - closest +
+            double leftBackPower   = x_rotated - y_rotated - yaw; //was - closest +
+            double rightBackPower  = x_rotated + y_rotated - yaw; //was + closest -
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -228,7 +224,7 @@ public class NewOpMode extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            // Show the elapsed game time and wheel power.
+            // Show the elapsed game time and wheel power
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
